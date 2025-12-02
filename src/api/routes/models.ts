@@ -5,6 +5,7 @@ import { tokenSplit } from '@/api/controllers/core.ts';
 
 // 图像模型映射
 export const IMAGE_MODEL_MAP = {
+    "jimeng-4.1": "high_aes_general_v41",
     "jimeng-4.0": "high_aes_general_v40",
     "jimeng-3.1": "high_aes_general_v30l_art:general_v3.0_18b",
     "jimeng-3.0": "high_aes_general_v30l:general_v3.0_18b",
@@ -47,6 +48,12 @@ export default {
 
             // 国际区模型列表
             const INTL = [
+                {
+                    id: 'jimeng-4.1',
+                    model_name: '图片 4.1',
+                    model_tip: '最新图像生成模型',
+                    model_req_key: 'high_aes_general_v41',
+                },
                 {
                     id: 'jimeng-4.0',
                     model_name: '图片 4.0',
@@ -147,6 +154,12 @@ export default {
 
             // CN 区域模型列表（对齐到现有格式）
             const CN = [
+                {
+                    id: 'jimeng-4.1',
+                    model_name: '图片 4.1',
+                    model_tip: '最新图像生成模型',
+                    model_req_key: 'high_aes_general_v41',
+                },
                 {
                     id: 'jimeng-4.0',
                     model_name: '图片 4.0',

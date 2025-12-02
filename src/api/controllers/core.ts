@@ -413,7 +413,16 @@ export async function ensureMsToken(refreshToken: string) {
   // 并发执行所有请求
   const results = await Promise.all(requests);
   
-  // 不记录失败结果，避免日志过多
+  // 输出每个IDC的请求结果
+  logger.info(`📡 IDC请求结果:`);
+  results.forEach(r => {
+    if (r.success) {
+      logger.info(`  ✅ ${r.idc}: 成功`);
+    } else {
+      const errorMsg = (r as any).error?.message || (r as any).response?.data?.errmsg || '未知错误';
+      logger.info(`  ❌ ${r.idc}: 失败 (${errorMsg})`);
+    }
+  });
   
   // 找到第一个成功的响应
   const successResult = results.find(r => r.success);
