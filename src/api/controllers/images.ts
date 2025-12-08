@@ -253,10 +253,10 @@ export async function generateImages(
   const displayResolution = resolutionType || "自定义";
   logger.info(`${sessionId} 使用模型: ${_model} 映射模型: ${model} ${finalWidth}x${finalHeight} 分辨率: ${displayResolution} 比例枚举: ${imageRatioEnum} 精细度: ${sampleStrength}`);
 
-  // 图片输入支持：国际区仅 jimeng-3.0；CN 区支持 jimeng-3.0 与 jimeng-4.0
-  const allowImage = _model === "jimeng-3.0" || _model === "jimeng-4.0";
+  // 图片输入支持
+  const allowImage = _model === "jimeng-3.0" || _model === "jimeng-4.0" || _model === "jimeng-4.1" || _model === "jimeng-4.5";
   if (imageList && imageList.length > 0 && !allowImage) {
-    throw new APIException(EX.API_REQUEST_PARAMS_INVALID, "该模型不支持图片，请使用 jimeng-3.0 或 jimeng-4.0").setHTTPStatusCode(400);
+    throw new APIException(EX.API_REQUEST_PARAMS_INVALID, "该模型不支持图片，请使用 jimeng-3.0 或 jimeng-4.0 或 jimeng-4.1 或 jimeng-4.5").setHTTPStatusCode(400);
   }
 
   const { totalCredit } = await getCredit(refreshToken);
