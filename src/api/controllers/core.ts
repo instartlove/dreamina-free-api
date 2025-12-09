@@ -97,7 +97,9 @@ const FAKE_HEADERS = {
   Accept: "application/json, text/plain, */*",
   "Accept-Encoding": "gzip, deflate, br, zstd",
   "Accept-language": "zh-CN,zh;q=0.9",
+  "App-Sdk-Version": APP_SDK_VERSION,
   "Cache-control": "no-cache",
+  "Content-Type": "application/json",
   "Last-event-id": "undefined",
   Appid: DEFAULT_ASSISTANT_ID,
   Appvr: VERSION_CODE,
@@ -107,15 +109,15 @@ const FAKE_HEADERS = {
   Referer: "https://dreamina.capcut.com/",
   Pf: PLATFORM_CODE,
   "Sec-Ch-Ua":
-    '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+    '"Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"',
   "Sec-Ch-Ua-Mobile": "?0",
   "Sec-Ch-Ua-Platform": '"Windows"',
   "Sec-Fetch-Dest": "empty",
   "Sec-Fetch-Mode": "cors",
-  // "Sec-Fetch-Site": "same-origin", 
-  "Sec-Fetch-Site": "same-site", 
+  // "Sec-Fetch-Site": "same-origin",
+  "Sec-Fetch-Site": "same-site",
   "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
 };
 // 文件最大大小
 const FILE_MAX_SIZE = 100 * 1024 * 1024;
@@ -450,19 +452,20 @@ export async function ensureMsToken(refreshToken: string) {
     let mwebHost: string | undefined;
     
     if (webDomain) {
-      // 形如 edit-api-sg.capcut.com 或 edit-api-us.capcut.com
-      const m = webDomain.match(/edit-api-([^.]+)\.capcut\.com$/);
+      // 形如 web-edit.us.capcut.com 或 edit-api-sg.capcut.com
+      const m = webDomain.match(/(?:web-edit\.|edit-api-)([^.]+)\.capcut\.com/);
       regionKey = m?.[1];
-      if (regionKey) {
-        mwebHost = regionKey.startsWith("us")
-          ? `https://dreamina-api.${regionKey.split(/[-]/)[0]}.capcut.com`
-          : `https://mweb-api-${regionKey}.capcut.com`;
+      // 只有 US 区域用 dreamina-api，其他区域用 mweb-api
+      if (regionKey === 'us') {
+        mwebHost = webDomain.replace(/web-edit\.|edit-api-/, 'dreamina-api.');
+      } else if (regionKey) {
+        mwebHost = `https://mweb-api-${regionKey}.capcut.com`;
       }
     }
-    
+
     // 兜底逻辑
     if (!mwebHost) {
-      if (countryCode === 'US') {
+      if (regionKey === 'us') {
         mwebHost = 'https://dreamina-api.us.capcut.com';
       } else if (regionKey) {
         mwebHost = `https://mweb-api-${regionKey}.capcut.com`;
@@ -580,7 +583,6 @@ export async function request(
   const sign = util.md5(
     `9e2c|${pathForSign.slice(-7)}|${PLATFORM_CODE}|${VERSION_CODE}|${deviceTime}||11ac`
   );
-  const isMwebHost = /mweb-api/.test(url);
   const isJimengHost = url.includes("jimeng.jianying.com");
   const regionParam = (options.params as any)?.region as string | undefined;
   const paramsObj = {
